@@ -34,8 +34,8 @@ def fetch_and_save_data():
 
         # --- DİĞER DÖVİZ & EMTİA ---
         ("EURTRY=X", "EUR/TRY", "FOREX"),
-        ("GBPTRY=X", "GBP/TRY", "FOREX"),     # Sterlin
-        ("EURUSD=X", "EUR/USD", "FOREX"),     # Euro/Dolar Paritesi
+        ("GBPTRY=X", "GBP/TRY", "FOREX"),     
+        ("EURUSD=X", "EUR/USD", "FOREX"),    
         ("BZ=F", "Brent Petrol", "COMMODITY"),
         ("SI=F", "Gümüş", "COMMODITY"),
     ]
@@ -50,7 +50,7 @@ def fetch_and_save_data():
     for yf_code, symbol_name, dtype in assets:
         try:
             ticker = yf.Ticker(yf_code)
-            # Veri çekme (2 Yıllık - Garanti olsun)
+           
             hist = ticker.history(period="2y")
             
             if hist.empty: continue
@@ -58,7 +58,6 @@ def fetch_and_save_data():
             hist = hist.ffill() 
             current_price = hist['Close'].iloc[-1]
 
-            # Helper: Geçmiş fiyat bulucu
             def get_past_price(days_ago):
                 try:
                     target_date = hist.index[-1] - datetime.timedelta(days=days_ago)
@@ -78,7 +77,7 @@ def fetch_and_save_data():
             chg_m = ((current_price - price_1m) / price_1m) * 100
             chg_y = ((current_price - price_1y) / price_1y) * 100
 
-            # Grafik Verisi (Son 45 gün)
+            
             chart_history = []
             recent_data = hist.tail(45)
             
@@ -86,17 +85,15 @@ def fetch_and_save_data():
                 val = row['Close']
                 # TL Çevirileri
                 if yf_code == "GC=F" or yf_code == "SI=F": val = (val * usd_price) / 31.1035
-                elif dtype == "CRYPTO": val = val * usd_price # Kriptoları TL yap
-                elif yf_code == "BZ=F": val = val * usd_price # Petrol TL
-                
-                # EUR/USD gibi pariteler olduğu gibi kalsın
+                elif dtype == "CRYPTO": val = val * usd_price 
+                elif yf_code == "BZ=F": val = val * usd_price 
+          
                 
                 chart_history.append({
                     "x": date.strftime('%Y-%m-%d'),
                     "y": round(val, 2)
                 })
 
-            # Fiyat Kayıt (TL Çevirileri)
             final_price = current_price
             if yf_code == "GC=F" or yf_code == "SI=F": final_price = (current_price * usd_price) / 31.1035
             elif dtype == "CRYPTO": final_price = current_price * usd_price

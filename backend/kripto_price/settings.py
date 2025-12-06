@@ -60,8 +60,6 @@ ROOT_URLCONF = 'kripto_price.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # DİKKAT: Aşağıdaki satır çok önemli.
-        # BASE_DIR (backend) klasörünün bir üstüne çık (.parent) ve 'frontend' klasörüne bak diyoruz.
         'DIRS': [BASE_DIR.parent / 'frontend'], 
         
         'APP_DIRS': True,
